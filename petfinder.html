@@ -1,0 +1,89 @@
+<html>
+<head>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script type ="text/javascript">
+function loaddata(){
+    //get values and append to out query string
+    var age = document.getElementById('age').value;
+    //var age = $('#age').val(); <-- this is jquery!
+    var zip = document.getElementById('location').value
+    //var zip = $('#location').val(); <-- this is jquery!
+
+
+    var link = 'http://api.petfinder.com/pet.find?key=&animal=dog&age=' +age + '&location=' + zip + '&format=json&count=5&output=full';
+
+    $.ajax({
+       type: 'GET',
+        url: link,
+        async: false,
+        contentType: "application/json",
+        dataType: 'jsonp',
+        success: function (data) {
+        var numberofdogs = data.petfinder.pets.pet.length;
+        for (var a=0;a<numberofdogs;a++){
+        var dogage = data.petfinder.pets.pet[a].age.$t;
+        var breedsarray = data.petfinder.pets.pet[a].breeds.breed;
+        var termnum = breedsarray.length;
+        var dogbreed = '';
+        for (var i=0;i<termnum;i++){
+             dogbreed += breedsarray[i].$t + ',';
+        }
+        var photosarray = data.petfinder.pets.pet[a].media.photos.photo;
+        //console.log(data.petfinder.pets.pet[a]);
+        var photonum = photosarray.length;
+        var photos ='';
+        for (var j=0;j<photonum;j++){
+            photos += '<img src = "' + photosarray[j].$t + ' height="50" width="50" onclick="window.open(\''+  photosarray[j].$t + '\');">';
+        }
+
+        var description = data.petfinder.pets.pet[a].description.$t;
+        var name = data.petfinder.pets.pet[a].name.$t;
+
+        document.getElementById('results').innerHTML += 'Age:' + dogage + '<br>Breed: ' + dogbreed + '<br>' + photos + '<br><h4>' + name + '</h4><br>' + description;
+    }
+
+         //breeds 
+         //description
+         //photos
+            //data will hold the data coming from the server
+        }
+    });
+}
+</script>
+
+</head>
+<body>
+<span id = "results">
+
+
+</span>
+<form>
+Search for your next best friend:<br/>
+<select id="age">
+<option value="Senior">Senior</option>
+<option value="Adult">Adult</option>
+<option value="Young">Young</option>
+<option value="Baby">Baby</option>
+</select>
+<label for="zip">Zip Code<input type = "text" id = "location"/></label>
+<!--<input type = "hidden" id="count" value="5"/>example of hiddens fields
+<input type = "hidden" id="output" value="full"/>-->
+<input type = "button" value="search" onclick="loaddata();"/>
+</form>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

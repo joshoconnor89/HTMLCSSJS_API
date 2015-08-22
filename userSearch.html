@@ -1,0 +1,71 @@
+<html>
+<head>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+    <script type ="text/javascript">
+$(document).ready(function() {
+  
+   $("#searchbtn").click(function() {
+    loaddata();
+   });
+
+
+  
+
+
+   function loaddata(){
+     var numperpage = 3;
+     var name = $("#search").val();
+     var links = '';
+     var target = 0;
+     var content = '';//document.getElementById("search")
+    $.ajax({
+        'async': false,
+        'global': false,
+        'url': "http://jsonplaceholder.typicode.com/users",
+        'dataType': "json",
+        'success': function (data) {
+            var results = 0;
+            var content = new Array();
+            for (var i =0;i<data.length;i++){
+              var patt = new RegExp(name);
+              if (patt.test(data[i].name)){
+                results++;
+              content.push(data[i].name  + '<br>' + data[i].address.street + ',' + data[i].address.suite + '<br>' +
+              data[i].address.city + ', ' + data[i].address.zipcode + '<br><br><hr>');
+              }
+           }
+            $("#results").html("there are " + results + " result(s)");
+            var numlinks =  Math.ceil(parseInt(results/numperpage));
+            links = '<a href = ""><< Prev</a> '
+            for (var j=0;j<numlinks;j++){
+                num = j + 1;
+                target = num * numperpage
+                links += '<a href = "#" onclick="showData(' + target + ');" >' + num + '</a> ';
+            }
+            links += '<a href = "">Next >></a> '
+
+            $("#links").html(links);
+            console.log(numlinks);
+
+             function showData(newTarget){
+                console.log(newTarget);
+                
+             }
+            //$("#tony").html(content);
+        
+
+          }
+      });
+      }
+});
+</script>
+
+</head>
+<body>
+<input type = "text" id = "search"> 
+<input type = "button" id ="searchbtn" value = "Search By Name">
+<h3 id = "results"></h3>
+<p id = "tony"></p>
+<p id = "links"></p>
+</body>
+</html>

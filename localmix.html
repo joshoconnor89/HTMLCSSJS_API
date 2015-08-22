@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<!--The following script tag downloads a font from the Adobe Edge Web Fonts server for use within the web page. We recommend that you do not modify it.-->
+<script>var __adobewebfontsappname__="dreamweaver"</script>
+<script src="http://use.edgefonts.net/revalia:n4:default;patrick-hand:n4:default.js" type="text/javascript"></script>
+
+<style>
+
+
+</style>
+
+</head>
+
+
+<script type="text/javascript" src="http://api.eventful.com/js/api">
+
+</script>
+
+<script type="text/javascript">
+
+
+function loaddata()
+
+{
+   //get variables
+
+   //Grab todays date 
+   var today = new Date();
+   var dd = today.getDate();
+   var mm = today.getMonth()+1; //January is 0!
+   var yyyy = today.getFullYear();
+
+    if(dd<10) {
+    dd='0'+dd
+    } 
+
+    if(mm<10) {
+    mm='0'+mm
+    } 
+
+    today = yyyy + mm + dd + "00"
+    console.log(today);
+
+   //Grab event type gathered from user input.
+   var eventType = document.getElementById('eventType').value;
+   console.log(eventType)
+
+   //Grab user's location from user input.
+   var zip = document.getElementById('location').value;
+   console.log(zip)
+
+
+   //Variable to fetch data from API.
+
+   var oArgs = {
+
+      app_key: "",
+
+      q: eventType,
+
+      where: zip,
+
+      "date": today + "-" +today,
+
+      page_size: 50,
+
+      sort_order: "popularity",
+
+   };
+
+   //Chop up our data.
+   var content = '';
+
+   EVDB.API.call("/events/search", oArgs, function(oData) {
+
+
+   //NO DATA FOUND 
+   if (oData.events == null) {
+     console.log("nothing here")
+     alert("No results found.");
+
+   } else{
+
+
+   //ONLY ONE RECORD FOUND
+    if (oData.events.event[0] == null) {
+
+       var eventTitle = oData.events.event.title
+       //console.log("Event title " +eventTitle)
+       var eventURL = oData.events.event.url
+       //console.log("Event URL " +eventURL)
+       var eventDescription = oData.events.event.description
+       //console.log("Event Description " +eventDescription)
+       var eventLatitude = oData.events.event.latitude
+       //console.log("Event Latitude " +eventLatitude)
+       var eventLongitude = oData.events.event.longitude
+       //console.log("Event Longitude " +eventLongitude)
+       var eventStartTime= oData.events.event.start_time
+       //console.log("Event Start Time " +eventStartTime)
+       var eventVenueAddress= oData.events.event.venue_address
+       //console.log("Event Venue Address " +eventVenueAddress)
+       var eventVenueName= oData.events.event.venue_name
+
+       if (oData.events.event.image == null) {
+           console.log("no image!")
+           var eventPhoto = '<img src = "http://www.cdjapan.co.jp/icons/no_image.gif" height="100" width="100" style="display:block; margin-left:auto; margin-right:auto;  padding-top: 15px;">'
+
+       //If there is an image from database
+       } else {
+           var eventPhotoURL= oData.events.event.image.medium.url
+
+           var highQualityPhoto = eventPhotoURL.replace("medium", "edpborder500")
+
+           var eventPhoto = '<img src = "' + highQualityPhoto +'" height="300" width="300" onclick="window.open(\''+  highQualityPhoto + '\');" style="display:block; margin-left:auto; margin-right:auto;">'
+
+           console.log("Event Photo " +eventPhoto)
+       }
+
+
+
+
+       
+
+       //Content to be added to the screen.
+       content += '<h2>' +eventTitle +'</h2>' + '<br>' + eventStartTime + '<br>'  + eventVenueName + '<br>' + eventVenueAddress + '<br>' + eventPhoto + '<br>' + eventDescription + '<br><br>'+ '<a href="' + eventURL + '">More Info</a>' + '<br><hr>' ;
+
+       //Add content to html.
+       $("#ListItems").html(content);
+
+
+
+
+
+   //MORE THAN ONE RECORD FOUND
+   } else {
+
+
+   var numberofevents = oData.events.event.length;
+   console.log("there are " + numberofevents +" events!");
+
+   console.log(oData)
+
+
+    //Our Event Data:
+    for (var a=0;a<numberofevents;a++){
+       var eventTitle = oData.events.event[a].title
+       //console.log("Event title " +eventTitle)
+       var eventURL = oData.events.event[a].url
+       //console.log("Event URL " +eventURL)
+       var eventDescription = oData.events.event[a].description
+       //console.log("Event Description " +eventDescription)
+       var eventLatitude = oData.events.event[a].latitude
+       //console.log("Event Latitude " +eventLatitude)
+       var eventLongitude = oData.events.event[a].longitude
+       //console.log("Event Longitude " +eventLongitude)
+       var eventStartTime= oData.events.event[a].start_time
+       //console.log("Event Start Time " +eventStartTime)
+       var eventVenueAddress= oData.events.event[a].venue_address
+       //console.log("Event Venue Address " +eventVenueAddress)
+       var eventVenueName= oData.events.event[a].venue_name
+       //console.log("Event Venue Name " +eventVenueName)
+
+
+       //Picture Quality is not very good.  No high quality image from data feed.  I have contacted Eventful about this.
+       
+       //If conditional handles error handling.
+       //If there is no image from database (image == null)
+       if (oData.events.event[a].image == null) {
+           console.log("no image!")
+           var eventPhoto = '<img src = "http://www.cdjapan.co.jp/icons/no_image.gif" height="100" width="100" style="display:block; margin-left:auto; margin-right:auto;  padding-top: 15px;">'
+
+       //If there is an image from database
+       } else {
+           var eventPhotoURL= oData.events.event[a].image.medium.url
+
+           var highQualityPhoto = eventPhotoURL.replace("medium", "edpborder500")
+
+           var eventPhoto = '<img src = "' + highQualityPhoto +'" height="300" width="300" onclick="window.open(\''+  highQualityPhoto + '\');" style="display:block; margin-left:auto; margin-right:auto;">'
+
+           console.log("Event Photo " +eventPhoto)
+
+
+
+       }
+
+       
+
+       //Content to be added to the screen.
+       content += '<h2>' +eventTitle +'</h2>' + '<br>' + eventStartTime + '<br>'  + eventVenueName + '<br>' + eventVenueAddress + '<br>' + eventPhoto + '<br>' + eventDescription + '<br><br>'+ '<a href="' + eventURL + '">More Info</a>' + '<br><hr>' ;
+
+       //Add content to html.
+       $("#ListItems").html(content);
+     }
+     }
+   }
+    });
+
+}
+
+</script>
+
+
+
+<body>
+
+
+<p style="text-align: center; font-family: patrick-hand; font-style: normal; font-weight: 400; font-size: 55px;">LocalMix<p>
+<form>
+<p style="text-align:center; font-family: Helvetica; margin-top:-40px; font-size: 15px; padding-bottom: 10px">Let's find something to do today!</p><br>
+
+
+
+&nbsp;&nbsp;<select id="eventType">
+<option value="Concerts">Concerts</option>
+<option value="Food">Food/Drink</option>
+<option value="Festivals">Festivals</option>
+<option value="Outdoor">Outdoor</option>
+<option value="Sports">Sports</option>
+<option value="Pets">Pets</option>
+<option value="Family">Family</option>
+<option value="Comedy">Comedy</option>
+</select>
+<label for="zip"><span style="font-family: Helvetica; font-size: 13px;">&nbsp;&nbsp;&nbsp;&nbsp;City</span>:<input type = "text" id = "location"/></label>
+<!--<input type = "hidden" id="count" value="5"/>example of hiddens fields
+<input type = "hidden" id="output" value="full"/>-->
+
+<br><br>
+
+<input type = "button" value="search" style="display: block; margin-left:auto; margin-right:auto;"onclick="loaddata();"/>
+</form>
+<br><br>
+<span id = "ListItems"></span>
+</body>
+
+</html>
+
